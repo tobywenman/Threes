@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grid_impl.h"
+#include "grid.h"
 
 #define symbol_col_count 6
 #define symbol_row_count 3

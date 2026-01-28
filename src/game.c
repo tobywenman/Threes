@@ -1,4 +1,4 @@
-#include "grid_impl.h"
+#include "game.h"
 
 bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, int x_offset, int y_offset)
 {

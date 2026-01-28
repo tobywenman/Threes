@@ -1,4 +1,6 @@
-#include "grid_impl.h"
+#include "grid.h"
+
+#include "game.h"
 
 grid_t* init_grid()
 {
