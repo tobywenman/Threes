@@ -11,4 +11,5 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 add_executable(threes
     src/main.c
     src/grid_impl.c
+    src/grid.c
 )

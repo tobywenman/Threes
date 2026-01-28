@@ -45,3 +45,7 @@ void add_to_map(pos_map_entry_t** pos_map, size_t* pos_map_occupancy, size_t* po
 // Re-hash the map into a bigger one.
 // mallocs a new map and frees the old one like realloc
 pos_map_entry_t* realloc_map(pos_map_entry_t* pos_map, size_t old_size, size_t new_size);
+
+pos_t get_chunk_pos(pos_t global_pos);
+size_t get_chunk_x(pos_t global_pos);
+size_t get_chunk_y(pos_t global_pos);

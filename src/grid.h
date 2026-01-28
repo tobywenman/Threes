@@ -7,7 +7,7 @@
 //     {bits: 2, name: 'count',  attr: ['1', '2', '3']                 , type: 4},
 //     {bits: 2, name: 'shape',  attr: ['CIRCLE', 'SQUARE', 'TRIANGLE'], type: 4},
 //     {bits: 1, name: 'valid', type: 3},
-//   	{bits: 1, name: 'reserved', type: 2},
+//     {bits: 1, name: 'reserved', type: 2},
 // ],}
 typedef uint8_t tile_t;
 
@@ -17,6 +17,8 @@ typedef struct pos_t
 }pos_t;
 
 typedef struct grid_t grid_t;
+
+grid_t init_grid();
 
 // Get value of tile at pos, returns invalid tile if it's never been read
 tile_t read_tile(const grid_t* grid, pos_t pos);

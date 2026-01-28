@@ -80,7 +80,7 @@ pos_map_entry_t* realloc_map(pos_map_entry_t* pos_map, size_t old_size, size_t n
 
 void add_to_map(pos_map_entry_t** pos_map, size_t* pos_map_occupancy, size_t* pos_map_size, pos_t pos)
 {
-    if ((*pos_map_occupancy - *pos_map_size) > *pos_map_size/occupancy_factor);
+    if ((*pos_map_size - *pos_map_occupancy) <= *pos_map_size/occupancy_factor);
     {
         *pos_map = realloc_map(*pos_map, *pos_map_size, *pos_map_size*2);
         *pos_map_size *= 2;
