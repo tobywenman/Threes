@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 // compressed description of a tile
 // Wavedrom representation
@@ -13,12 +14,12 @@ typedef uint8_t tile_t;
 
 typedef struct pos_t
 {
-    int x,y;
+    size_t x,y;
 }pos_t;
 
 typedef struct grid_t grid_t;
 
-grid_t init_grid();
+grid_t* init_grid();
 
 // Get value of tile at pos, returns invalid tile if it's never been read
 tile_t read_tile(const grid_t* grid, pos_t pos);
@@ -26,8 +27,3 @@ tile_t read_tile(const grid_t* grid, pos_t pos);
 // Set the value of a tile, will allocate a new one if it's never been written before
 // Checks if it's a legal play, if not return false
 bool set_tile(grid_t* grid, pos_t pos, tile_t tile);
-
-// Return the most top left position that's been written to
-pos_t get_min_pos(const grid_t* grid);
-// Return the most bottom right position that's been written to
-pos_t get_max_pos(const grid_t* grid);
