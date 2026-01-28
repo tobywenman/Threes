@@ -1,3 +1,5 @@
+#pragma once
+
 #include "grid.h"
 #include <stdlib.h>
 
@@ -11,4 +13,4 @@
 typedef struct grid_t
 {
     tile_t data[grid_size][grid_size];
-};
+}grid_t;

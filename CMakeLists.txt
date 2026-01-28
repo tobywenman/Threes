@@ -12,4 +12,5 @@ add_executable(threes
     src/main.c
     src/grid_impl.c
     src/grid.c
+    src/cli.c
 )
