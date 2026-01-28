@@ -38,3 +38,10 @@ bool do_map_search(size_t* idx, const pos_map_entry_t* pos_map, size_t pos_map_s
 
 // Push new chunk into container
 void add_chunk(chunk_t** chunk_data, size_t* chunk_container_size, size_t* num_chunks);
+
+// Add pos to map, if it out grows the container it will re-hash everything
+void add_to_map(pos_map_entry_t** pos_map, size_t* pos_map_occupancy, size_t* pos_map_size, pos_t pos);
+
+// Re-hash the map into a bigger one.
+// mallocs a new map and frees the old one like realloc
+pos_map_entry_t* realloc_map(pos_map_entry_t* pos_map, size_t old_size, size_t new_size);
