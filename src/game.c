@@ -1,7 +1,40 @@
 #include "game.h"
 
-bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, int x_offset, int y_offset)
+size_t find_line_end(const grid_t* grid, pos_t pos, bool max, bool horizontal)
 {
+    size_t out_val;
+    pos_t search_pos = pos;
+    if (horizontal)
+    {
+        out_val = pos.y;
+        search_pos.y = (max) ? search_pos.y+1 : search_pos.y-1;
+    }
+    else
+    {
+        out_val = pos.x;
+        search_pos.x = (max) ? search_pos.x+1 : search_pos.x-1;
+    }
+    while (tile_valid(read_tile(grid, search_pos)))
+    {
+        if (horizontal)
+        {
+            out_val = search_pos.y;
+            search_pos.y = (max) ? search_pos.y+1 : search_pos.y-1;
+        }
+        else
+        {
+            out_val = search_pos.x;
+            search_pos.x = (max) ? search_pos.x+1 : search_pos.x-1;
+        }
+    }
+    return out_val;
+}
+
+bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, bool horizontal)
+{
+    size_t min_val = find_line_end(grid, pos, false, horizontal);
+    size_t max_val = find_line_end(grid, pos, true, horizontal);
+
     bool colour_common = true;
     bool shape_common  = true;
     bool count_common  = true;
@@ -10,26 +43,29 @@ bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, int x_offset,
     uint8_t count  = tile_count(tile);
     uint8_t shape  = tile_shape(tile);
 
-    pos.x += x_offset;
-    pos.y += y_offset;
-
-    while (tile_valid(grid->data[pos.x][pos.y]))
+    for (size_t search_val = min_val; search_val<max_val+1; search_val++)
     {
-        if (colour != tile_colour(grid->data[pos.x][pos.y]))
+        pos_t search_pos = pos;
+        if (horizontal)
+            search_pos.y = search_val;
+        else
+            search_pos.x = search_val;
+
+        tile_t search_tile = read_tile(grid, search_pos);
+
+        if (colour != tile_colour(search_tile))
             colour_common = false;
-        if (count != tile_count(grid->data[pos.x][pos.y]))
+        if (count != tile_count(search_tile))
             count_common = false;
-        if (shape != tile_shape(grid->data[pos.x][pos.y]))
+        if (shape != tile_shape(search_tile))
             shape_common = false;
 
         if (colour_common && count_common && shape_common)
             return false;
         else if (!colour_common && !count_common && !shape_common)
             return false;
-
-        pos.x += x_offset;
-        pos.y += y_offset;
     }
+
     return true;
 }
 
@@ -37,19 +73,20 @@ bool verify_legal(const grid_t* grid, pos_t pos, tile_t tile)
 {
     bool found_neighbour = false;
 
+    if (!verify_legal_line(grid, pos, tile, true) || !verify_legal_line(grid, pos, tile, false))
+        return false;
+
     for (int x_offset = -1; x_offset<2; x_offset++)
     {
         for (int y_offset = -1; y_offset<2; y_offset++)
         {
             if ((x_offset == 0 && y_offset != 0) || (x_offset != 0 && y_offset == 0))
             {
-                if (!verify_legal_line(grid, pos, tile, x_offset, y_offset))
-                    return false;
                 if (tile_valid(grid->data[pos.x+x_offset][pos.y+y_offset]))
-                    found_neighbour = true;
+                    return true;
             }
         } 
     }
 
-    return found_neighbour;
+    return false;
 }
