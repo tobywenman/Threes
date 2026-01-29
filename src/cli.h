@@ -12,6 +12,6 @@ typedef struct tile_string_t
 
 void print_grid(const grid_t* grid);
 
-tile_string_t tile_to_string(tile_t tile);
+tile_string_t tile_to_string(tile_t tile, pos_t pos);
 
 void print_tile(tile_string_t tile_string);

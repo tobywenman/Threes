@@ -1,6 +1,7 @@
 #include "cli.h"
 
 #include <stdio.h>
+#include <string.h>
 
 const tile_string_t blank = {{"      ",
                               "      ",
@@ -19,10 +20,17 @@ const tile_string_t circle   = {{" .--. ",
                                  "(    )",
                                  " `--' "}};
 
-tile_string_t tile_to_string(tile_t tile)
+tile_string_t tile_to_string(tile_t tile, pos_t pos)
 {
     if (!(tile&0b01000000))
-        return blank;
+    {
+        tile_string_t output = blank;
+
+        char coords[10];
+        sprintf(coords, "%02x,%02x,", pos.x, pos.y);
+        memcpy(output.data[1], coords, symbol_col_count);
+        return output;
+    }
 
     tile_string_t output;
     uint8_t colour = tile&0x03;
@@ -87,7 +95,7 @@ void print_grid(const grid_t* grid)
         for (size_t col=0; col<grid_size; col++)
         {
             pos_t pos = {row, col};
-            tile_strings[row][col] = tile_to_string(read_tile(grid, pos));
+            tile_strings[row][col] = tile_to_string(read_tile(grid, pos), pos);
 
             if (read_tile(grid, pos) & 0b01000000)
             {
@@ -103,6 +111,13 @@ void print_grid(const grid_t* grid)
             }
         }
     }
+
+    constexpr size_t border_size = 1;
+    
+    min_row -= border_size;
+    min_col -= border_size;
+    max_row += border_size;
+    max_col += border_size;
 
     if (found)
     {
