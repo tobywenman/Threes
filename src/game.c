@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include <stdlib.h>
+
 size_t find_line_end(const grid_t* grid, pos_t pos, bool max, bool horizontal)
 {
     size_t out_val;
@@ -89,4 +91,42 @@ bool verify_legal(const grid_t* grid, pos_t pos, tile_t tile)
     }
 
     return false;
+}
+
+game_state_t* init_game()
+{
+    game_state_t* game = malloc(sizeof(game_state_t));
+
+    game->grid = init_grid();
+
+    game->num_players = 0;
+    game->num_tiles = bag_size;
+
+    fill_bag(game->bag);
+    return game;
+}
+
+void fill_bag(tile_t* bag)
+{
+    size_t bag_idx=0;
+    for (size_t i=0; i<3; i++)
+        for (size_t colour=0; colour<3; colour++)
+            for (size_t count=0; count<3; count++)
+                for (size_t shape=0; shape<3; shape++)
+                {
+                    bag[bag_idx] = 0b01000000 | colour | (count<<2) | (shape<<4);
+                    ++bag_idx;
+                }
+
+    // Shuffle the bag
+    // https://benpfaff.org/writings/clc/shuffle.html
+    {
+        for (size_t i=0; i<bag_size-1; i++)
+        {
+            size_t j = i + rand() / (RAND_MAX / (bag_size - i) + 1);
+            tile_t temp = bag[j];
+            bag[j] = bag[i];
+            bag[i] = temp;
+        }
+    }
 }

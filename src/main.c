@@ -1,5 +1,5 @@
 #include "cli.h"
-
+#include "game.h"
 #include <stdio.h>
 
 int main()
@@ -31,6 +31,10 @@ int main()
     print_grid(grid);
     printf("\n");
 
+    game_state_t* game = init_game();
+
+    for (size_t i=0; i<bag_size; i++)
+        print_tile(tile_to_string(game->bag[i], pos));
 
     return 0;
 }
