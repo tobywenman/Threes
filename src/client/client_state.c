@@ -5,6 +5,7 @@
 
 client_state_t* init_state()
 {
+    TTF_Init();
     SDL_Init(SDL_INIT_VIDEO);
     client_state_t* state = malloc(sizeof(client_state_t));
 
@@ -105,8 +106,16 @@ void splash_init(client_state_t* state)
         fprintf(stderr, "SDL_LoadBMP Error: %s\n", SDL_GetError());
         SDL_Quit();
     }
-    scene_state->texture = SDL_CreateTextureFromSurface(state->renderer, bmp);
+    scene_state->background_texture = SDL_CreateTextureFromSurface(state->renderer, bmp);
     SDL_DestroySurface(bmp);
+
+    TTF_Font* font = TTF_OpenFont("../src/client/img/Freedom-10eM.ttf", 28 );
+    SDL_Color textcolour = {0x00, 0x00, 0x00, 0xFF};
+    
+    SDL_Surface* text_surface = TTF_RenderText_Blended(font, "textureText.c_str()", 0, textcolour);
+
+    scene_state->text_texture = SDL_CreateTextureFromSurface(state->renderer, text_surface);
+    SDL_DestroySurface(text_surface);
 
     state->scene_state = scene_state;
 }
@@ -121,13 +130,18 @@ void splash_main(client_state_t* state)
         }
     }
     SDL_RenderClear(state->renderer);
-    SDL_RenderTexture(state->renderer, ((splash_state_t*)(state->scene_state))->texture, NULL, NULL);
+    SDL_RenderTexture(state->renderer, ((splash_state_t*)(state->scene_state))->background_texture, NULL, NULL);
+
+    SDL_FRect texture_size;
+    SDL_GetTextureSize(((splash_state_t*)(state->scene_state))->text_texture, &texture_size.w, &texture_size.h);
+    SDL_RenderTexture(state->renderer, ((splash_state_t*)(state->scene_state))->text_texture, NULL, &texture_size);
+
     SDL_RenderPresent(state->renderer);
 }
 
 void splash_end(client_state_t* state)
 {
-    SDL_DestroyTexture(((splash_state_t*)(state->scene_state))->texture);
+    SDL_DestroyTexture(((splash_state_t*)(state->scene_state))->background_texture);
     free(state->scene_state);
 }
 

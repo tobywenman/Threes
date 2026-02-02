@@ -45,6 +45,14 @@ else()
 message(STATUS "Using local SDL3_image")
 endif()
 
+find_package(SDL3_ttf QUIET)
+if (NOT SDL3_ttf)
+message(STATUS "Getting SDL3_ttf from Github")
+include_dependency(SDL3_ttf https://github.com/libsdl-org/SDL_ttf.git release-3.2.2)
+else()
+message(STATUS "Using local SDL3_ttf")
+endif()
+
 set(COMMON_SRC src/common/game.c
                src/common/grid.c
                src/common/cli.c)
@@ -65,4 +73,4 @@ target_include_directories(threees_server PUBLIC src/common)
 target_include_directories(threees_client PUBLIC src/common)
 
 # link all libraries to the project
-target_link_libraries(threees_client PRIVATE SDL3::SDL3 SDL3_image::SDL3_image)
+target_link_libraries(threees_client PRIVATE SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)

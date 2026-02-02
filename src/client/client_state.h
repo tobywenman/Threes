@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 typedef enum scene_e
 {
@@ -27,7 +28,8 @@ void change_scene(client_state_t* state, scene_e new_scene);
 
 typedef struct splash_state_t
 {
-    SDL_Texture* texture;
+    SDL_Texture* background_texture;
+    SDL_Texture* text_texture;
 }splash_state_t;
 
 // Each scene has a init, main loop and destructor function
