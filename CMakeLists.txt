@@ -65,7 +65,8 @@ add_executable(threees_server
 
 add_executable(threees_client
     src/client/client_main.c
-    src/client/client_state.c
+    src/client/states.c
+    src/client/splash.c
     ${COMMON_SRC}
 )
 
