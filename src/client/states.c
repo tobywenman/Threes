@@ -1,5 +1,6 @@
 #include "states.h"
 #include "client_main.h"
+#include "splash.h"
 
 bool call_state_main(main_state_t* state)
 {

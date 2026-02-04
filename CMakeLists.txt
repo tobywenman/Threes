@@ -32,8 +32,8 @@ endfunction()
 find_package(SDL3 QUIET)
 if (NOT SDL3_FOUND)
 message(STATUS "Getting SDL3 from Github")
-include_dependency(SDL3 https://github.com/libsdl-org/SDL.git release-3.4.0)
-else()
+include_dependency(SDL3 https://github.com/libsdl-org/SDL.git 59e3ad0079a4d80fc339d48ca62c37b640bf0f01) # TODO, to build on rocky 9 it needs this fix https://github.com/libsdl-org/SDL/pull/14773
+else()                                                                                                  # The latest pinned release doesn't have that yet
 message(STATUS "Using local SDL3")
 endif()
 
