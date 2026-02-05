@@ -67,6 +67,8 @@ add_executable(threees_client
     src/client/client_main.c
     src/client/states.c
     src/client/splash.c
+    src/client/button.c
+    src/client/menu.c
     ${COMMON_SRC}
 )
 

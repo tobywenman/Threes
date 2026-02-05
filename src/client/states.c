@@ -1,6 +1,7 @@
 #include "states.h"
 #include "client_main.h"
 #include "splash.h"
+#include "menu.h"
 
 bool call_state_main(main_state_t* state)
 {
@@ -8,8 +9,8 @@ bool call_state_main(main_state_t* state)
     {
     case SPLASH:
         return splash_main(state);
-    // case MENU:
-    //     return menu_main(state);
+    case MENU:
+        return menu_main(state);
     // case SERVER_JOIN:
     //     return server_join_main(state);
     // case GAME:
