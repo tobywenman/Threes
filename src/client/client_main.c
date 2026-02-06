@@ -41,6 +41,9 @@ bool init_main_state(main_state_t* state)
 
     state->state = SPLASH;
 
+    state->width_mult = (float)state->draw_surface->w / (float)state->win_surface->w;
+    state->height_mult = (float)state->draw_surface->h / (float)state->win_surface->h;
+
     splash_init(state);
 
     return true;

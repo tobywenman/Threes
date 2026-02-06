@@ -16,6 +16,9 @@ typedef struct main_state_t
     state_e state;
 
     void* state_data;
+
+    float width_mult;
+    float height_mult;
 }main_state_t;
 
 bool init_main_state(main_state_t* state);
