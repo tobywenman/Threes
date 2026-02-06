@@ -8,16 +8,28 @@
 #include "client_main.h"
 #include "splash.h"
 
+#define fps_cap 60
+#define frame_ns 1000000000 / fps_cap
+
 int main()
 {
     main_state_t* state = malloc(sizeof(main_state_t));;
     if (!init_main_state(state))
         return 1;
 
+    uint64_t frame_start_time;
+
     while(call_state_main(state))
     {
+        frame_start_time = SDL_GetTicksNS();
         SDL_BlitSurfaceScaled(state->draw_surface, NULL, state->win_surface, NULL, SDL_SCALEMODE_PIXELART);
         SDL_UpdateWindowSurface(state->win);
+
+        uint64_t time_diff = SDL_GetTicksNS() - frame_start_time;
+        if (time_diff < frame_ns)
+        {
+            SDL_DelayNS(frame_ns - time_diff);
+        }
     }
     destroy_free_state(state);
 }

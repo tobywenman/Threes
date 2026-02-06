@@ -1,5 +1,7 @@
 #include "menu.h"
 
+#include "server_join.h"
+
 void menu_init(main_state_t* state)
 {
     menu_data_t* data = malloc(sizeof(menu_data_t));
@@ -56,7 +58,8 @@ bool menu_main(main_state_t* state)
                 if (butt_id == data->join_id)
                 {
                     destroy_menu(state);
-                    return false;
+                    server_join_init(state);
+                    return true;
                 }
                 else if (butt_id == data->settings_id)
                 {
