@@ -8,6 +8,27 @@
 
 #define max_input_chars 1000
 
+static void draw_text_box(TTF_Font* font, const char* text, SDL_Rect rect, SDL_Surface* surface)
+{
+    SDL_Color text_colour = {0,0,0, 0xff};
+    SDL_Surface* text_surface = TTF_RenderText_Blended_Wrapped(font, text, 0, text_colour, rect.w);
+
+    SDL_Rect src_rect = rect;
+    src_rect.x = 0;
+    src_rect.y = 0;
+
+    SDL_Rect border_rect = rect;
+    border_rect.x -= 1;
+    border_rect.y -= 1;
+    border_rect.h += 2;
+    border_rect.w += 2;
+
+    SDL_FillSurfaceRect(surface, &border_rect, 0);
+    SDL_FillSurfaceRect(surface, &rect, 0xFFFFFF);
+    SDL_BlitSurface(text_surface, &src_rect, surface, &rect);
+    SDL_DestroySurface(text_surface);
+}
+
 void server_join_init(main_state_t* state)
 {
     server_join_data_t* data = malloc(sizeof(server_join_data_t));
@@ -24,6 +45,15 @@ void server_join_init(main_state_t* state)
     SDL_StartTextInput(state->win);
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
+
+    SDL_Rect text_pos = {40, 80, 240, 40};
+    draw_text_box(data->font, data->input_string, text_pos, state->draw_surface);
+
+    text_pos.y = 0;
+    SDL_Color text_colour = {0,0,0, 0xff};
+    SDL_Surface* text_surface = TTF_RenderText_Solid(data->font, "Enter server address", 0, text_colour);
+    SDL_BlitSurface(text_surface, NULL, state->draw_surface, &text_pos);
+
 }
 
 bool server_join_main(main_state_t* state)
@@ -85,14 +115,11 @@ bool server_join_main(main_state_t* state)
         }
         if( e.type == SDL_EVENT_TEXT_INPUT )
         {
-            printf("in text input state!\n");
             if(!(SDL_GetModState() & SDL_KMOD_CTRL))
             {
-                printf("getting char %c!\n", e.text.text[0]);
                 size_t text_idx = 0;
                 while (data->string_length < max_input_chars-1 && e.text.text[text_idx] != '\0')
                 {
-                    printf("adding char\n");
                     data->input_string[data->string_length] = e.text.text[text_idx];
                     ++data->string_length;
                     ++text_idx;
@@ -105,14 +132,8 @@ bool server_join_main(main_state_t* state)
     }
     if (need_text_update)
     {
-        printf("updating text! %s\n", data->input_string);
-        printf("string length: %lu\n", data->string_length);
-        SDL_Color text_colour = {0,0,0, 0xff};
-        SDL_Surface* text = TTF_RenderText_Blended_Wrapped(data->font, data->input_string, data->string_length, text_colour, 100);
-
-        SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
-        SDL_BlitSurface(text, NULL, state->draw_surface, NULL);
-        SDL_DestroySurface(text);
+        SDL_Rect text_pos = {40, 80, 240, 40};
+        draw_text_box(data->font, data->input_string, text_pos, state->draw_surface);
     }
     return true;
 }
