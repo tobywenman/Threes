@@ -69,14 +69,14 @@ bool server_join_main(main_state_t* state)
                 
                 if (clipboard_len + data->string_length >= max_input_chars)
                 {
-                    clipboard_len = max_input_chars-data->string_length-1;
+                    clipboard_len = max_input_chars-data->string_length;
                     tempText[clipboard_len] = '\0';
                 }
 
 
                 memcpy(&data->input_string[data->string_length], tempText, clipboard_len);
 
-                data->string_length += clipboard_len;
+                data->string_length += clipboard_len-1;
 
                 SDL_free(tempText);
 
@@ -108,7 +108,7 @@ bool server_join_main(main_state_t* state)
         printf("updating text! %s\n", data->input_string);
         printf("string length: %lu\n", data->string_length);
         SDL_Color text_colour = {0,0,0, 0xff};
-        SDL_Surface* text = TTF_RenderText_Blended_Wrapped(data->font, data->input_string, data->string_length-1, text_colour, 100);
+        SDL_Surface* text = TTF_RenderText_Blended_Wrapped(data->font, data->input_string, data->string_length, text_colour, 100);
 
         SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
         SDL_BlitSurface(text, NULL, state->draw_surface, NULL);
