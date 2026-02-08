@@ -6,8 +6,6 @@
 
 #include "font_paths.h"
 
-#define max_input_chars 1000
-
 static void draw_text_box(TTF_Font* font, const char* text, SDL_Rect rect, SDL_Surface* surface)
 {
     SDL_Color text_colour = {0,0,0, 0xff};
@@ -34,7 +32,6 @@ void server_join_init(main_state_t* state)
     server_join_data_t* data = malloc(sizeof(server_join_data_t));
 
     data->string_length = 0;
-    data->input_string = malloc(max_input_chars);
     data->input_string[0] = '\0';
     data->font = TTF_OpenFont(font_path, 16);
 
@@ -112,6 +109,11 @@ bool server_join_main(main_state_t* state)
 
                 need_text_update = true;
             }
+            if (e.key.key == SDLK_RETURN)
+            {
+                server_join_destroy(state);
+                return false;
+            }
         }
         if( e.type == SDL_EVENT_TEXT_INPUT )
         {
@@ -136,4 +138,12 @@ bool server_join_main(main_state_t* state)
         draw_text_box(data->font, data->input_string, text_pos, state->draw_surface);
     }
     return true;
+}
+
+void server_join_destroy(main_state_t* state)
+{
+    server_join_data_t* data = state->state_data;
+
+    TTF_CloseFont(data->font);
+    free(data);
 }
