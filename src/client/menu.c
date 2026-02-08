@@ -18,9 +18,10 @@ void menu_init(main_state_t* state)
     #define button_space 16
     #define button_start_y 16
 
-    SDL_Rect rect = {button_x,button_start_y,button_width,button_height};
+    SDL_Rect rect = {button_x,button_start_y,button_width,2*button_height};
     data->join_id = add_button(&data->button_manager, rect, "Connect to Server!");
-    rect.y += button_height + button_space;
+    rect.y += (2*button_height) + button_space;
+    rect.h = button_height;
     data->settings_id = add_button(&data->button_manager, rect, "Settings.");
     rect.y += button_height + button_space;
     data->quit_id = add_button(&data->button_manager, rect, "Quit.");
