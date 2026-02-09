@@ -72,3 +72,13 @@ void destroy_free_state(main_state_t* state)
     SDL_Quit();
     free(state);
 }
+
+float get_x_scale_factor(const main_state_t* state)
+{
+    return (float)state->draw_surface->w / (float)state->win_surface->w;
+}
+
+float get_y_scale_factor(const main_state_t* state)
+{
+    return (float)state->draw_surface->h / (float)state->win_surface->h;
+}

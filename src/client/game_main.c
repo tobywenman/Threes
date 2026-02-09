@@ -2,7 +2,6 @@
 
 #include <SDL3_image/SDL_image.h>
 
-
 void game_main_init(main_state_t* state, char* server_addr)
 {
     game_main_data_t* data = malloc(sizeof(game_main_data_t));
@@ -12,32 +11,19 @@ void game_main_init(main_state_t* state, char* server_addr)
 
     data->tiles = IMG_Load(tile_path);
 
+    data->x_offset = 0;
+    data->y_offset = 0;
+
     state->state_data = data;
 
     state->state = GAME;
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
-
-    int x_offset = 0;
-    int y_offset = 0;
-    for (uint8_t colour=0; colour<3; colour++)
-    {
-        for (uint8_t count=0; count<3; count++)
-        {
-            for (uint8_t shape=0; shape<3; shape++)
-            {
-                tile_t tile = generate_tile(colour, count, shape);
-                blit_tile(data->tiles, tile, state->draw_surface, x_offset*tile_size, y_offset*tile_size);
-                ++x_offset;
-            }
-        }
-        x_offset = 0;
-        ++y_offset;
-    }
 }
 
 bool game_main(main_state_t* state)
 {
+    game_main_data_t* data = state->state_data;
     SDL_Event e;
     SDL_zero(e);
 
@@ -50,7 +36,19 @@ bool game_main(main_state_t* state)
             //End the main loop
             return false;
         }
+        if (e.type == SDL_EVENT_MOUSE_MOTION)
+        {
+            if (e.motion.state & SDL_BUTTON_RMASK)
+            {
+                data->x_offset += e.motion.xrel * get_x_scale_factor(state);
+                data->y_offset += e.motion.yrel * get_y_scale_factor(state);
+            }
+        }
     }
+
+    draw_grid(state);
+
+    blit_tile(data->tiles, generate_tile(0,0,0), state->draw_surface, 0, 0);
     return true;
 }
 
@@ -70,5 +68,25 @@ void blit_tile(SDL_Surface* tiles, tile_t tile, SDL_Surface* surface, size_t til
         SDL_Rect src_rect = {count*tile_size, (colour*tile_size*3) + (shape*tile_size), tile_size, tile_size};
     
         SDL_BlitSurface(tiles, &src_rect, surface, &target);
+    }
+}
+
+void draw_grid(main_state_t* state)
+{
+    game_main_data_t* data = state->state_data;
+
+    int x_offset = (int)data->x_offset % tile_size;
+    int y_offset = (int)data->y_offset % tile_size;
+
+    SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
+    for (int i=x_offset; i<state->draw_surface->w; i+=tile_size)
+    {
+        SDL_Rect line_rect = {i, 0, 1, state->draw_surface->h};
+        SDL_FillSurfaceRect(state->draw_surface, &line_rect, 0);
+    }
+    for (int i=y_offset; i<state->draw_surface->h; i+=tile_size)
+    {
+        SDL_Rect line_rect = {0, i, state->draw_surface->w, 1};
+        SDL_FillSurfaceRect(state->draw_surface, &line_rect, 0);
     }
 }

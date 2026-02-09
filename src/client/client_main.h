@@ -24,3 +24,6 @@ typedef struct main_state_t
 bool init_main_state(main_state_t* state);
 
 void destroy_free_state(main_state_t* state);
+
+float get_x_scale_factor(const main_state_t* state);
+float get_y_scale_factor(const main_state_t* state);
