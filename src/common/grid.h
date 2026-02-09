@@ -42,6 +42,7 @@ uint8_t tile_count(tile_t tile);
 
 uint8_t tile_shape(tile_t tile);
 
+tile_t generate_tile(uint8_t colour, uint8_t count, uint8_t shape);
 
 grid_t* init_grid();
 

@@ -70,6 +70,7 @@ add_executable(threees_client
     src/client/button.c
     src/client/menu.c
     src/client/server_join.c
+    src/client/game_main.c
     ${COMMON_SRC}
 )
 

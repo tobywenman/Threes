@@ -3,6 +3,7 @@
 #include "splash.h"
 #include "menu.h"
 #include "server_join.h"
+#include "game_main.h"
 
 bool call_state_main(main_state_t* state)
 {
@@ -14,8 +15,8 @@ bool call_state_main(main_state_t* state)
         return menu_main(state);
     case SERVER_JOIN:
         return server_join_main(state);
-    // case GAME:
-    //     return game_main(state);
+    case GAME:
+        return game_main(state);
     // case QUIT:
     //     return quit_main(state);
     }

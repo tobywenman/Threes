@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "font_paths.h"
+#include "game_main.h"
 
 static void draw_text_box(TTF_Font* font, const char* text, SDL_Rect rect, SDL_Surface* surface)
 {
@@ -111,8 +112,17 @@ bool server_join_main(main_state_t* state)
             }
             if (e.key.key == SDLK_RETURN)
             {
+                size_t addr_len = strlen(data->input_string);
+
+                char* server_addr = malloc(addr_len);
+
+                strcpy(server_addr, data->input_string);
+
                 server_join_destroy(state);
-                return false;
+
+                game_main_init(state, server_addr);
+
+                return true;
             }
         }
         if( e.type == SDL_EVENT_TEXT_INPUT )

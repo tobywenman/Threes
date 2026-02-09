@@ -39,6 +39,15 @@ uint8_t tile_shape(tile_t tile)
     return (tile>>4)&0x03;
 }
 
+tile_t generate_tile(uint8_t colour, uint8_t count, uint8_t shape)
+{
+    tile_t tile = 0b01000000;
+    tile |= colour;
+    tile |= count<<2;
+    tile |= shape<<4;
+    return tile;
+}
+
 bool set_tile(grid_t* grid, pos_t pos, tile_t tile, bool first_tile)
 {
     if (!verify_legal(grid, pos, tile) && !first_tile)
