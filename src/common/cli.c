@@ -82,37 +82,9 @@ void print_grid(const grid_t* grid)
 {
     size_t min_row, min_col, max_row, max_col;
 
-    bool found = false;
+    bool found = find_corners(grid, &min_col, &max_col, &min_row, &max_row);
 
-    min_row = grid_size;
-    min_col = grid_size;
-    max_row = 0;
-    max_col = 0;
-
-    tile_string_t tile_strings[grid_size][grid_size];
-    for (size_t row=0; row<grid_size; row++)
-    {
-        for (size_t col=0; col<grid_size; col++)
-        {
-            pos_t pos = {row, col};
-            tile_strings[row][col] = tile_to_string(read_tile(grid, pos), pos);
-
-            if (read_tile(grid, pos) & 0b01000000)
-            {
-                found = true;
-                if (row < min_row)
-                    min_row = row;
-                if (col < min_col)
-                    min_col = col;
-                if (row > max_row)
-                    max_row = row;
-                if (col > max_col)
-                    max_col = col;
-            }
-        }
-    }
-
-    constexpr size_t border_size = 1;
+    #define border_size 1;
     
     min_row -= border_size;
     min_col -= border_size;
@@ -126,9 +98,14 @@ void print_grid(const grid_t* grid)
             for (size_t sub_row=0; sub_row<symbol_row_count; sub_row++)
             {
                 for (size_t col=min_col; col<max_col+1; col++)
+                {
+                    pos_t pos = {col, row};
+                    tile_string_t tile_string = tile_to_string(read_tile(grid, pos), pos);
                     for (size_t char_idx=0; char_idx<symbol_col_count; char_idx++)
-                        putchar(tile_strings[row][col].data[sub_row][char_idx]);
-    
+                    {
+                        putchar(tile_string.data[sub_row][char_idx]);
+                    }
+                }
                 putchar('\n');
             }
         }

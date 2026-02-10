@@ -52,3 +52,5 @@ tile_t read_tile(const grid_t* grid, pos_t pos);
 // Set the value of a tile, will allocate a new one if it's never been written before
 // Checks if it's a legal play, if not return false
 bool set_tile(grid_t* grid, pos_t pos, tile_t tile, bool first_tile);
+
+bool find_corners(const grid_t* grid, size_t* min_x, size_t* max_x, size_t* min_y, size_t* max_y);

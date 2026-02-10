@@ -56,3 +56,35 @@ bool set_tile(grid_t* grid, pos_t pos, tile_t tile, bool first_tile)
     grid->data[pos.x][pos.y] = tile;
     return true;
 }
+
+bool find_corners(const grid_t* grid, size_t* min_x, size_t* max_x, size_t* min_y, size_t* max_y)
+{
+    bool found = false;
+    *min_x = grid_size;
+    *min_y = grid_size;
+    *max_x = 0;
+    *max_y = 0;
+    for (size_t x=0; x<grid_size; x++)
+    {
+        for (size_t y=0; y<grid_size; y++)
+        {
+            pos_t pos = {x,y};
+            tile_t tile = read_tile(grid, pos);
+
+            if (tile_valid(tile))
+            {
+                found = true;
+                if (x < *min_x)
+                    *min_x = x;
+                if (x > *max_x)
+                    *max_x = x;
+
+                if (y < *min_y)
+                    *min_y = y;
+                if (y > *max_y)
+                    *max_y = y;
+            }
+        }
+    }
+    return found;
+}
