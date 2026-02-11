@@ -19,6 +19,24 @@ void game_main_init(main_state_t* state, char* server_addr)
     state->state = GAME;
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
+
+    pos_t pos = {10,10};
+    tile_t tile = generate_tile(0,0,0);
+
+    set_tile(data->grid, pos, tile, true);
+    pos.x = 10;
+    pos.y = 11;
+    tile = generate_tile(0,0,1);
+    set_tile(data->grid, pos, tile, false);
+    pos.x = 10;
+    pos.y = 12;
+    tile = generate_tile(0,0,2);
+    set_tile(data->grid, pos, tile, false);
+    pos.x = 11;
+    pos.y = 12;
+    tile = generate_tile(1,0,2);
+    set_tile(data->grid, pos, tile, false);
+
 }
 
 bool game_main(main_state_t* state)
@@ -40,15 +58,19 @@ bool game_main(main_state_t* state)
         {
             if (e.motion.state & SDL_BUTTON_RMASK)
             {
-                data->x_offset += e.motion.xrel * get_x_scale_factor(state);
-                data->y_offset += e.motion.yrel * get_y_scale_factor(state);
+                data->x_offset -= e.motion.xrel * get_x_scale_factor(state);
+                data->y_offset -= e.motion.yrel * get_y_scale_factor(state);
+
+                if (data->x_offset < 0)
+                    data->x_offset = 0;
+                if (data->y_offset < 0)
+                    data->y_offset = 0;
             }
         }
     }
 
     draw_grid(state);
 
-    blit_tile(data->tiles, generate_tile(0,0,0), state->draw_surface, 0, 0);
     return true;
 }
 
@@ -75,18 +97,35 @@ void draw_grid(main_state_t* state)
 {
     game_main_data_t* data = state->state_data;
 
-    int x_offset = (int)data->x_offset % tile_size;
-    int y_offset = (int)data->y_offset % tile_size;
+    size_t x_shift = tile_size - ((size_t)(data->x_offset) % tile_size);
+    size_t y_shift = tile_size - ((size_t)(data->y_offset) % tile_size);
+
+    size_t x_num_tiles = (px_width / tile_size) + 1; // +1 deals with the misalignment
+    size_t y_num_tiles = (px_height / tile_size) + 1; // +1 deals with the misalignment
+
+    size_t x_tile_start = (size_t)(data->x_offset) / tile_size;
+    size_t y_tile_start = (size_t)(data->y_offset) / tile_size;
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
-    for (int i=x_offset; i<state->draw_surface->w; i+=tile_size)
+    for (size_t i=x_shift; i<state->draw_surface->w; i+=tile_size)
     {
         SDL_Rect line_rect = {i, 0, 1, state->draw_surface->h};
         SDL_FillSurfaceRect(state->draw_surface, &line_rect, 0);
     }
-    for (int i=y_offset; i<state->draw_surface->h; i+=tile_size)
+    for (size_t i=y_shift; i<state->draw_surface->h; i+=tile_size)
     {
         SDL_Rect line_rect = {0, i, state->draw_surface->w, 1};
         SDL_FillSurfaceRect(state->draw_surface, &line_rect, 0);
+    }
+
+    for (size_t x = x_tile_start; x<x_tile_start+x_num_tiles; x++)
+    {
+        for (size_t y = y_tile_start; y<y_tile_start+y_num_tiles; y++)
+        {
+            pos_t pos = {x, y};
+            tile_t tile = read_tile(data->grid, pos);
+            if (tile_valid(tile))
+                blit_tile(data->tiles, tile, state->draw_surface, ((x-x_tile_start)*tile_size)+x_shift, ((y-y_tile_start)*tile_size)+y_shift);
+        }
     }
 }
