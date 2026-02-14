@@ -1,6 +1,42 @@
 #include "game_main.h"
 
+#include <stdio.h>
 #include <SDL3_image/SDL_image.h>
+
+static float clamp_offset(size_t min, size_t max, size_t screen_width, float offset)
+{
+    float min_limit = (max+2)*tile_size-screen_width;
+    float max_limit = (min+1)*tile_size;
+
+    if (offset < 0)
+        return 0;
+    else if (offset < min_limit)
+        return min_limit;
+    else if (offset > max_limit)
+        return max_limit;
+    else
+        return offset;
+}
+
+static void limit_offsets(main_state_t* state)
+{
+    game_main_data_t* data = state->state_data;
+
+    size_t min_x, max_x, min_y, max_y;
+
+    #define border_width 2
+
+    if (find_corners(data->grid, &min_x, &max_x, &min_y, &max_y))
+    {
+        data->x_offset = clamp_offset(min_x, max_x, px_width, data->x_offset);
+        data->y_offset = clamp_offset(min_y, max_y, px_height, data->y_offset);
+    }
+    else
+    {
+        data->x_offset = 0;
+        data->y_offset = 0;
+    }
+}
 
 void game_main_init(main_state_t* state, char* server_addr)
 {
@@ -20,23 +56,21 @@ void game_main_init(main_state_t* state, char* server_addr)
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
 
-    pos_t pos = {10,10};
+    pos_t pos = {32,32};
     tile_t tile = generate_tile(0,0,0);
 
     set_tile(data->grid, pos, tile, true);
-    pos.x = 10;
-    pos.y = 11;
+    pos.x += 1;
     tile = generate_tile(0,0,1);
     set_tile(data->grid, pos, tile, false);
-    pos.x = 10;
-    pos.y = 12;
+    pos.x += 1;
     tile = generate_tile(0,0,2);
     set_tile(data->grid, pos, tile, false);
-    pos.x = 11;
-    pos.y = 12;
+    pos.x += 1;
     tile = generate_tile(1,0,2);
     set_tile(data->grid, pos, tile, false);
 
+    limit_offsets(state);
 }
 
 bool game_main(main_state_t* state)
@@ -61,10 +95,7 @@ bool game_main(main_state_t* state)
                 data->x_offset -= e.motion.xrel * get_x_scale_factor(state);
                 data->y_offset -= e.motion.yrel * get_y_scale_factor(state);
 
-                if (data->x_offset < 0)
-                    data->x_offset = 0;
-                if (data->y_offset < 0)
-                    data->y_offset = 0;
+                limit_offsets(state);
             }
         }
     }
@@ -100,11 +131,11 @@ void draw_grid(main_state_t* state)
     size_t x_shift = tile_size - ((size_t)(data->x_offset) % tile_size);
     size_t y_shift = tile_size - ((size_t)(data->y_offset) % tile_size);
 
-    size_t x_num_tiles = (px_width / tile_size) + 1; // +1 deals with the misalignment
-    size_t y_num_tiles = (px_height / tile_size) + 1; // +1 deals with the misalignment
+    size_t x_num_tiles = (px_width / tile_size);
+    size_t y_num_tiles = (px_height / tile_size);
 
-    size_t x_tile_start = (size_t)(data->x_offset) / tile_size;
-    size_t y_tile_start = (size_t)(data->y_offset) / tile_size;
+    size_t x_tile_start = ((size_t)(data->x_offset) / tile_size);
+    size_t y_tile_start = ((size_t)(data->y_offset) / tile_size);
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
     for (size_t i=x_shift; i<state->draw_surface->w; i+=tile_size)
@@ -118,9 +149,9 @@ void draw_grid(main_state_t* state)
         SDL_FillSurfaceRect(state->draw_surface, &line_rect, 0);
     }
 
-    for (size_t x = x_tile_start; x<x_tile_start+x_num_tiles; x++)
+    for (size_t x = x_tile_start-1; x<x_tile_start+x_num_tiles; x++)
     {
-        for (size_t y = y_tile_start; y<y_tile_start+y_num_tiles; y++)
+        for (size_t y = y_tile_start-1; y<y_tile_start+y_num_tiles+1; y++)
         {
             pos_t pos = {x, y};
             tile_t tile = read_tile(data->grid, pos);
