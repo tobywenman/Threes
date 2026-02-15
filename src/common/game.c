@@ -127,3 +127,25 @@ void fill_bag(tile_t* bag)
         }
     }
 }
+
+void push_tile_hand(hand_t* hand, tile_t tile)
+{
+    hand->tiles[hand->num_tiles] = tile;
+    ++hand->num_tiles;
+}
+
+void pop_tile_hand(hand_t* hand, size_t idx)
+{
+    for (size_t i=idx; i<hand->num_tiles-1; i++)
+    {
+        hand->tiles[i] = hand->tiles[i+1];
+    }
+    --hand->num_tiles;
+}
+
+void play_tile(turn_t* turn, tile_t tile, pos_t pos)
+{
+    turn->poses[turn->num_tiles] = pos;
+    turn->tiles[turn->num_tiles] = tile;
+    ++turn->num_tiles;
+}

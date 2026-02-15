@@ -46,3 +46,8 @@ void fill_bag(tile_t* bag);
 
 bool verify_legal(const grid_t* grid, pos_t pos, tile_t tile);
 bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, bool horizontal);
+
+void push_tile_hand(hand_t* hand, tile_t tile);
+void pop_tile_hand(hand_t* hand, size_t idx);
+
+void play_tile(turn_t* turn, tile_t tile, pos_t pos);

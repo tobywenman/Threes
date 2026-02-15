@@ -44,4 +44,6 @@ SDL_Surface* get_overlay(button_manager_t* manager, size_t id);
 
 bool get_selected(const button_manager_t* manager, button_id_t* id);
 
+void clear_selected(button_manager_t* manager);
+
 void destroy_buttons(button_manager_t* manager);

@@ -70,9 +70,16 @@ void game_main_init(main_state_t* state, char* server_addr)
         }
     }
 
-    SDL_Rect finish_turn_rect = {hand_x, px_height-hand_y-20, 50, 20};
+    const size_t button_height = 20;
+    const size_t button_width = 50;
 
-    add_button_text(&data->hand_buttons, finish_turn_rect, "Place");
+    SDL_Rect button_rect = {hand_x, px_height-hand_y-20, button_width, button_height};
+
+    data->exchange_id = add_button_text(&data->hand_buttons, button_rect, "Exchange");
+    button_rect.y -= button_height + 4;
+    data->clear_id = add_button_text(&data->hand_buttons, button_rect, "Clear");
+    button_rect.y -= button_height + 4;
+    data->place_id = add_button_text(&data->hand_buttons, button_rect, "Place");
 
     data->player_hand.num_tiles = hand_size;
     for (size_t i=0; i<hand_size; i++) 
@@ -114,9 +121,34 @@ bool game_main(main_state_t* state)
                 button_id_t id;
                 if (get_id_at_pos(&data->hand_buttons, &id, e.button.x*state->width_mult, e.button.y*state->height_mult))
                 {
-                    if (id < hand_size)
+                    if (id < data->player_hand.num_tiles)
                     {
                         select_button(&data->hand_buttons, id);
+                    }
+                    else if (id == data->exchange_id)
+                    {
+
+                    }
+                    else if (id == data->clear_id)
+                    {
+                        for (size_t i=0; i<data->cur_turn.num_tiles; i++)
+                        {
+                            pos_t pos = data->cur_turn.poses[i];
+                            data->grid->data[pos.x][pos.y] = 0;
+                            push_tile_hand(&data->player_hand, data->cur_turn.tiles[i]);
+                        }
+
+                        data->cur_turn.num_tiles = 0;
+
+                        size_t min_x, max_x, min_y, max_y;
+                        if (!find_corners(data->grid, &min_x, &max_x, &min_y, &max_y))
+                        {
+                            data->first_tile = true;
+                        }
+                    }
+                    else if (id == data->place_id)
+                    {
+
                     }
                 }
                 else
@@ -127,8 +159,13 @@ bool game_main(main_state_t* state)
 
                         pos_t pos = {((e.motion.x*state->width_mult + data->x_offset)/tile_size)-1, ((e.button.y*state->height_mult + data->y_offset)/tile_size)-1};
 
-                        set_tile(data->grid, pos, tile, data->first_tile);
-                        data->first_tile = false;
+                        if(set_tile(data->grid, pos, tile, data->first_tile))
+                        {
+                            play_tile(&data->cur_turn, tile, pos);
+                            data->first_tile = false;
+                            pop_tile_hand(&data->player_hand, id);
+                            clear_selected(&data->hand_buttons);
+                        }
                     }
                 }
             }

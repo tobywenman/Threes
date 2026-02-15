@@ -29,6 +29,11 @@ typedef struct game_main_data_t
     hand_t player_hand;
 
     bool first_tile;
+
+    turn_t cur_turn;
+
+    button_id_t clear_id, exchange_id, place_id;
+
 }game_main_data_t;
 
 void game_main_init(main_state_t* state, char* server_addr);

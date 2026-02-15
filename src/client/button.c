@@ -142,3 +142,9 @@ bool get_selected(const button_manager_t* manager, button_id_t* id)
         }
     return false;
 }
+
+void clear_selected(button_manager_t* manager)
+{
+    for (size_t i=0; i<manager->num_buttons; i++)
+        manager->buttons[i].selected = false;
+}
