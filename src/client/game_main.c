@@ -5,8 +5,8 @@
 
 static float clamp_offset(size_t min, size_t max, size_t screen_width, float offset)
 {
-    float min_limit = (max+2)*tile_size-screen_width;
-    float max_limit = (min+1)*tile_size;
+    float min_limit = (min+2)*tile_size-screen_width;
+    float max_limit = (max+1)*tile_size;
 
     if (offset < 0)
         return 0;
