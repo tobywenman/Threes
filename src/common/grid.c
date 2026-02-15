@@ -1,6 +1,7 @@
 #include "grid.h"
 
 #include "game.h"
+#include <stdio.h>
 
 grid_t* init_grid()
 {
@@ -54,6 +55,8 @@ bool set_tile(grid_t* grid, pos_t pos, tile_t tile, bool first_tile)
         return false;
 
     grid->data[pos.x][pos.y] = tile;
+
+    printf("setting tile %x %lu, %lu\n", tile, pos.x, pos.y);
     return true;
 }
 

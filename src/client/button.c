@@ -131,3 +131,14 @@ SDL_Surface* get_overlay(button_manager_t* manager, size_t id)
 {
     return manager->buttons[id].surface_overlay;
 }
+
+bool get_selected(const button_manager_t* manager, button_id_t* id)
+{
+    for (size_t i=0; i<manager->num_buttons; i++)
+        if (manager->buttons[i].selected)
+        {
+            *id = i;
+            return true;
+        }
+    return false;
+}

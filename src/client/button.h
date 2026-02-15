@@ -42,4 +42,6 @@ void blit_buttons(const button_manager_t* manager, SDL_Surface* target);
 
 SDL_Surface* get_overlay(button_manager_t* manager, size_t id);
 
+bool get_selected(const button_manager_t* manager, button_id_t* id);
+
 void destroy_buttons(button_manager_t* manager);

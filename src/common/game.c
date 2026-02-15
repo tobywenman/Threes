@@ -6,7 +6,7 @@ size_t find_line_end(const grid_t* grid, pos_t pos, bool max, bool horizontal)
 {
     size_t out_val;
     pos_t search_pos = pos;
-    if (horizontal)
+    if (!horizontal)
     {
         out_val = pos.y;
         search_pos.y = (max) ? search_pos.y+1 : search_pos.y-1;
@@ -18,7 +18,7 @@ size_t find_line_end(const grid_t* grid, pos_t pos, bool max, bool horizontal)
     }
     while (tile_valid(read_tile(grid, search_pos)))
     {
-        if (horizontal)
+        if (!horizontal)
         {
             out_val = search_pos.y;
             search_pos.y = (max) ? search_pos.y+1 : search_pos.y-1;
@@ -37,10 +37,6 @@ bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, bool horizont
     size_t min_val = find_line_end(grid, pos, false, horizontal);
     size_t max_val = find_line_end(grid, pos, true, horizontal);
 
-    bool colour_common = true;
-    bool shape_common  = true;
-    bool count_common  = true;
-
     uint8_t colour = tile_colour(tile);
     uint8_t count  = tile_count(tile);
     uint8_t shape  = tile_shape(tile);
@@ -49,18 +45,18 @@ bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, bool horizont
     {
         pos_t search_pos = pos;
         if (horizontal)
-            search_pos.y = search_val;
-        else
             search_pos.x = search_val;
+        else
+            search_pos.y = search_val;
+
+        if (search_pos.x == pos.x && search_pos.y == pos.y)
+            continue;
 
         tile_t search_tile = read_tile(grid, search_pos);
 
-        if (colour != tile_colour(search_tile))
-            colour_common = false;
-        if (count != tile_count(search_tile))
-            count_common = false;
-        if (shape != tile_shape(search_tile))
-            shape_common = false;
+        bool colour_common = colour == tile_colour(search_tile);
+        bool count_common = count == tile_count(search_tile);
+        bool shape_common = shape == tile_shape(search_tile);
 
         if (colour_common && count_common && shape_common)
             return false;
@@ -73,7 +69,8 @@ bool verify_legal_line(const grid_t* grid, pos_t pos, tile_t tile, bool horizont
 
 bool verify_legal(const grid_t* grid, pos_t pos, tile_t tile)
 {
-    bool found_neighbour = false;
+    if (tile_valid(read_tile(grid, pos)))
+        return false;
 
     if (!verify_legal_line(grid, pos, tile, true) || !verify_legal_line(grid, pos, tile, false))
         return false;

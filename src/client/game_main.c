@@ -73,6 +73,12 @@ void game_main_init(main_state_t* state, char* server_addr)
     SDL_Rect finish_turn_rect = {hand_x, px_height-hand_y-20, 50, 20};
 
     add_button_text(&data->hand_buttons, finish_turn_rect, "Place");
+
+    data->player_hand.num_tiles = hand_size;
+    for (size_t i=0; i<hand_size; i++) 
+        data->player_hand.tiles[i] = generate_tile(i, 0, 0);
+
+    data->first_tile = true;
 }
 
 bool game_main(main_state_t* state)
@@ -106,11 +112,23 @@ bool game_main(main_state_t* state)
             if (e.button.button == 1)
             {
                 button_id_t id;
-                if (get_id_at_pos(&data->hand_buttons, &id, e.motion.x*state->width_mult, e.motion.y*state->height_mult))
+                if (get_id_at_pos(&data->hand_buttons, &id, e.button.x*state->width_mult, e.button.y*state->height_mult))
                 {
                     if (id < hand_size)
                     {
                         select_button(&data->hand_buttons, id);
+                    }
+                }
+                else
+                {
+                    if (get_selected(&data->hand_buttons, &id))
+                    {
+                        tile_t tile = data->player_hand.tiles[id];
+
+                        pos_t pos = {((e.motion.x*state->width_mult + data->x_offset)/tile_size)-1, ((e.button.y*state->height_mult + data->y_offset)/tile_size)-1};
+
+                        set_tile(data->grid, pos, tile, data->first_tile);
+                        data->first_tile = false;
                     }
                 }
             }
@@ -127,9 +145,9 @@ bool game_main(main_state_t* state)
 void blit_tile(SDL_Surface* tiles, tile_t tile, SDL_Surface* surface, size_t tile_x, size_t tile_y)
 {
     SDL_Rect target = {tile_x,tile_y,tile_size,tile_size};
-    if (!tile_valid)
+    if (!tile_valid(tile))
     {
-        SDL_FillSurfaceRect(surface, &target, 0xFFFFFF);
+        SDL_FillSurfaceRect(surface, &target, 0);
     }
     else
     {
@@ -179,8 +197,6 @@ void draw_grid(main_state_t* state)
         }
     }
 }
-
-
 
 void draw_hand(main_state_t* state)
 {
