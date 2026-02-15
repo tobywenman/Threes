@@ -33,8 +33,8 @@ static void limit_offsets(main_state_t* state)
     }
     else
     {
-        data->x_offset = 0;
-        data->y_offset = 0;
+        data->x_offset = (grid_size/2)*tile_size;
+        data->y_offset = (grid_size/2)*tile_size;
     }
 }
 
@@ -56,21 +56,23 @@ void game_main_init(main_state_t* state, char* server_addr)
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
 
-    pos_t pos = {32,32};
-    tile_t tile = generate_tile(0,0,0);
-
-    set_tile(data->grid, pos, tile, true);
-    pos.x += 1;
-    tile = generate_tile(0,0,1);
-    set_tile(data->grid, pos, tile, false);
-    pos.x += 1;
-    tile = generate_tile(0,0,2);
-    set_tile(data->grid, pos, tile, false);
-    pos.x += 1;
-    tile = generate_tile(1,0,2);
-    set_tile(data->grid, pos, tile, false);
-
     limit_offsets(state);
+
+    data->hand_buttons = init_button_manager();
+
+    {
+        SDL_Rect button_rect = {hand_x+tile_border,hand_y+tile_border,tile_size+2*tile_border, tile_size + tile_border*2};
+        for (size_t i=0; i<hand_size; i++)
+        {
+            SDL_Surface* butt_surface = SDL_CreateSurface(button_rect.w, button_rect.h, SDL_PIXELFORMAT_RGBA8888);
+            add_button_surface(&data->hand_buttons, button_rect, butt_surface);
+            button_rect.y += tile_size + tile_border*2;
+        }
+    }
+
+    SDL_Rect finish_turn_rect = {hand_x, px_height-hand_y-20, 50, 20};
+
+    add_button_text(&data->hand_buttons, finish_turn_rect, "Place");
 }
 
 bool game_main(main_state_t* state)
@@ -97,10 +99,27 @@ bool game_main(main_state_t* state)
 
                 limit_offsets(state);
             }
+            update_hover_mouse(&data->hand_buttons, e.motion.x*state->width_mult, e.motion.y*state->height_mult);
+        }
+        if(e.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+        {
+            if (e.button.button == 1)
+            {
+                button_id_t id;
+                if (get_id_at_pos(&data->hand_buttons, &id, e.motion.x*state->width_mult, e.motion.y*state->height_mult))
+                {
+                    if (id < hand_size)
+                    {
+                        select_button(&data->hand_buttons, id);
+                    }
+                }
+            }
         }
     }
 
     draw_grid(state);
+
+    draw_hand(state);
 
     return true;
 }
@@ -159,4 +178,30 @@ void draw_grid(main_state_t* state)
                 blit_tile(data->tiles, tile, state->draw_surface, ((x-x_tile_start)*tile_size)+x_shift, ((y-y_tile_start)*tile_size)+y_shift);
         }
     }
+}
+
+
+
+void draw_hand(main_state_t* state)
+{
+    game_main_data_t* data = state->state_data;
+
+    size_t width = tile_size + tile_border*2 + hand_border*2;
+    size_t height = (tile_size + 2*tile_border)*(hand_size) + hand_border*2;
+
+    SDL_Rect rect = {hand_x, hand_y, width, height};
+
+    SDL_FillSurfaceRect(state->draw_surface, &rect, 0xFFFFFF);
+
+    for (size_t i=0; i<hand_size; i++)
+    {
+        SDL_Surface* button_surface = get_overlay(&data->hand_buttons, i);
+
+        if (i<data->player_hand.num_tiles)
+            blit_tile(data->tiles, data->player_hand.tiles[i],button_surface, tile_border, tile_border);
+        else
+            blit_tile(data->tiles, 0, button_surface, tile_border, tile_border);
+    }
+
+    blit_buttons(&data->hand_buttons, state->draw_surface);
 }

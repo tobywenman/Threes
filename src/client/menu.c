@@ -19,12 +19,12 @@ void menu_init(main_state_t* state)
     #define button_start_y 16
 
     SDL_Rect rect = {button_x,button_start_y,button_width,2*button_height};
-    data->join_id = add_button(&data->button_manager, rect, "Connect to Server!");
+    data->join_id = add_button_text(&data->button_manager, rect, "Connect to Server!");
     rect.y += (2*button_height) + button_space;
     rect.h = button_height;
-    data->settings_id = add_button(&data->button_manager, rect, "Settings.");
+    data->settings_id = add_button_text(&data->button_manager, rect, "Settings.");
     rect.y += button_height + button_space;
-    data->quit_id = add_button(&data->button_manager, rect, "Quit.");
+    data->quit_id = add_button_text(&data->button_manager, rect, "Quit.");
 
     SDL_FillSurfaceRect(state->draw_surface, NULL, 0xFFFFFF);
 
