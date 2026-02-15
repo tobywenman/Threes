@@ -60,6 +60,7 @@ set(COMMON_SRC src/common/game.c
 # Add your executable
 add_executable(threees_server
     src/server/server_main.c
+    src/server/server_networking.c
     ${COMMON_SRC}
 )
 
@@ -71,6 +72,7 @@ add_executable(threees_client
     src/client/menu.c
     src/client/server_join.c
     src/client/game_main.c
+    src/client/networking.c
     ${COMMON_SRC}
 )
 

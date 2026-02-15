@@ -6,6 +6,7 @@
 
 #include "font_paths.h"
 #include "game_main.h"
+#include "networking.h"
 
 static void draw_text_box(TTF_Font* font, const char* text, SDL_Rect rect, SDL_Surface* surface)
 {
@@ -118,9 +119,17 @@ bool server_join_main(main_state_t* state)
 
                 strcpy(server_addr, data->input_string);
 
-                server_join_destroy(state);
-
-                game_main_init(state, server_addr);
+                network_data_t* network_data = malloc(sizeof(network_data_t));
+                if (connect_to_server(network_data, server_addr))
+                {
+                    server_join_destroy(state);
+                    game_main_init(state, server_addr);
+                }
+                else
+                {
+                    free(network_data);
+                    free(server_addr);
+                }
 
                 return true;
             }
