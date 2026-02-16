@@ -86,6 +86,8 @@ void game_main_init(main_state_t* state, char* server_addr)
         data->player_hand.tiles[i] = generate_tile(i, 0, 0);
 
     data->first_tile = true;
+
+    data->cur_turn.num_tiles = 0;
 }
 
 bool game_main(main_state_t* state)

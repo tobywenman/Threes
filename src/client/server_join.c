@@ -113,7 +113,7 @@ bool server_join_main(main_state_t* state)
             }
             if (e.key.key == SDLK_RETURN)
             {
-                size_t addr_len = strlen(data->input_string);
+                size_t addr_len = strlen(data->input_string)+1;
 
                 char* server_addr = malloc(addr_len);
 
