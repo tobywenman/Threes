@@ -4,9 +4,11 @@
 
 #include "font_paths.h"
 
-void lobby_init(main_state_t* state)
+void lobby_init(main_state_t* state, network_data_t* network_data)
 {
     lobby_data_t* data = malloc(sizeof(lobby_data_t));
+
+    data->network_data = network_data;
 
     state->state_data = data;
 
@@ -62,6 +64,18 @@ bool lobby_main(main_state_t* state)
                 {
                     printf("toggling!\n");
                     toggle_selected(&data->button_manager, id);
+
+                    client_packet_t packet;
+                    if (get_selected(&data->button_manager, &id))
+                    {
+                        packet.type = READY;
+                    }
+                    else
+                    {
+                        packet.type = NOT_READY;
+                    }
+
+                    send_client_packet(data->network_data, packet);
                 }
             }
         }

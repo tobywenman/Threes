@@ -123,7 +123,7 @@ bool server_join_main(main_state_t* state)
                 if (connect_to_server(network_data, server_addr))
                 {
                     server_join_destroy(state);
-                    lobby_init(state);
+                    lobby_init(state, network_data);
                 }
                 else
                 {

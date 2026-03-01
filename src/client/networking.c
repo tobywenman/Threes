@@ -21,7 +21,7 @@ static void *get_in_addr(struct sockaddr *sa)
 
 bool connect_to_server(network_data_t* network_data, char* server_name)
 {
-    bool success = true;
+    bool connected = false;
     int status;
     
     struct addrinfo hints, *p;
@@ -37,11 +37,10 @@ bool connect_to_server(network_data_t* network_data, char* server_name)
 
     if ((status = getaddrinfo(server_name, PORT, &hints, &servinfo)) != 0) {
         fprintf(stderr, "gai error: %s\n", gai_strerror(status));
-        success = false;
         goto exit;
     }
 
-    bool connected = false;
+    
 
     int sockfd;
     for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -62,19 +61,48 @@ bool connect_to_server(network_data_t* network_data, char* server_name)
             continue;
         }
 
+        network_data->sock = sockfd;
+
         connected = true;
 
         break;
     }
 
-    if (!connected)
+    exit:
+    return connected;
+}
+
+void send_client_packet(network_data_t* network_data, client_packet_t packet)
+{
+    char* packet_data;
+    int len;
+    switch (packet.type)
     {
-        success = false;
-        goto exit;
+        // Dataless packets
+        case NOT_READY:
+        case READY:
+        case EXIT:
+        // Something, something big endian...
+            len = sizeof(client_packets_e);
+            packet_data = malloc(len);
+            memcpy(packet_data, &packet.type, len);
+            break;
+        case PLAY_TURN:
+        case EXCHANGE:
     }
 
-    close(sockfd);
+    
+    while (len>0)
+    {
+        int bytes_sent;
+        if ((bytes_sent = send(network_data->sock, packet_data, len, 0)) != -1)
+            len -= bytes_sent;
+        else
+        {
+            perror("client: can't send");
+            exit(1);
+        }
+    }
 
-    exit:
-    return success;
-}
+    free(packet_data);
+};

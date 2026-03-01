@@ -25,7 +25,20 @@ static void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-int wait_for_client()
+void* listen_for_packets(void* thread_data)
+{
+    listen_thread_data_t* data = thread_data;
+    char* buff[1000];
+    while(recv(data->player_network->sock, buff, 1000, 0) > 0)
+    {
+        printf("found packet: %lu!\n", data->id);
+    }
+    printf("sock closed\n");
+    close(data->player_network->sock);
+    return nullptr;
+}
+
+void wait_for_client(thread_player_stack_t* players)
 {
     int sock;
 
@@ -43,7 +56,7 @@ int wait_for_client()
     int error_code;
     if ((error_code = getaddrinfo(NULL, PORT, &hints, &servinfos)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(error_code));
-        return 1;
+        return;
     }
     struct addrinfo* servinfo;
     for (servinfo=servinfos; servinfo!=nullptr; servinfo=servinfo->ai_next)
@@ -101,7 +114,12 @@ int wait_for_client()
             get_in_addr((struct sockaddr *)&their_addr),
             s, sizeof s);
         printf("server: got connection from %s\n", s);
-
-        close(new_fd);  // parent doesn't need this
+        
+        listen_thread_data_t* thread_data = malloc(sizeof(listen_thread_data_t));
+        thread_data->player_network = &players->data[players->num_players];
+        thread_data->id = players->num_players;
+        players->data[players->num_players].sock = new_fd;
+        pthread_create(&players->data[players->num_players].listen_thread, NULL, listen_for_packets, thread_data);
+        ++players->num_players;
     }
 }
