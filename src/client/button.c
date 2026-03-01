@@ -148,3 +148,8 @@ void clear_selected(button_manager_t* manager)
     for (size_t i=0; i<manager->num_buttons; i++)
         manager->buttons[i].selected = false;
 }
+
+void toggle_selected(button_manager_t* manager, button_id_t id)
+{
+    manager->buttons[id].selected = !manager->buttons[id].selected;
+}

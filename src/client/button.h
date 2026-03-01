@@ -46,4 +46,6 @@ bool get_selected(const button_manager_t* manager, button_id_t* id);
 
 void clear_selected(button_manager_t* manager);
 
+void toggle_selected(button_manager_t* manager, button_id_t id);
+
 void destroy_buttons(button_manager_t* manager);

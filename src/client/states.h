@@ -5,6 +5,7 @@ typedef enum state_e
     SPLASH,
     MENU,
     SERVER_JOIN,
+    LOBBY,
     GAME,
     QUIT,
 }state_e;

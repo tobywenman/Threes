@@ -5,8 +5,8 @@
 #include <stdio.h>
 
 #include "font_paths.h"
-#include "game_main.h"
 #include "networking.h"
+#include "lobby.h"
 
 static void draw_text_box(TTF_Font* font, const char* text, SDL_Rect rect, SDL_Surface* surface)
 {
@@ -33,8 +33,8 @@ void server_join_init(main_state_t* state)
 {
     server_join_data_t* data = malloc(sizeof(server_join_data_t));
 
-    data->string_length = 0;
-    data->input_string[0] = '\0';
+    strcpy(data->input_string, "localhost");
+    data->string_length = strlen(data->input_string);
     data->font = TTF_OpenFont(font_path, 16);
 
     state->state_data = data;
@@ -123,7 +123,7 @@ bool server_join_main(main_state_t* state)
                 if (connect_to_server(network_data, server_addr))
                 {
                     server_join_destroy(state);
-                    game_main_init(state, server_addr);
+                    lobby_init(state);
                 }
                 else
                 {
